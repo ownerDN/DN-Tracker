@@ -1,1 +1,38 @@
+name: Build DN Tracker APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Extract DN Tracker project
+        run: |
+          mkdir app
+          unzip -q DN_Tracker_APK_Builder.zip -d app
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.5"
+          channel: stable
+          cache: true
+
+      - name: Get packages
+        working-directory: app
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: app
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DN-Tracker-APK
+          path: app/build/app/outputs/flutter-apk/app-release.apk
